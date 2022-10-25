@@ -1,0 +1,11 @@
+set_assign_scoring
+set_implicit_block_scoring -off
+set_expr_scoring -all
+
+set_fsm_scoring -hold_transition
+set_toggle_scoring -sv_enum
+set_toggle_scoring -sv_enum enable_mda
+set_toggle_scoring -sv_enum -sv_struct_with_enum
+
+set_covergroup -per_instance_default_one
+set_covergroup -new_instance_reporting

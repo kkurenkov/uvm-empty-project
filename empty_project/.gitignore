@@ -1,0 +1,13 @@
+xmvlog*
+*.err
+*.diag
+run/.bpad/
+*.key
+run/xmsim_*
+*.log*
+run/.sim*
+run/scr3*
+run/*.shm
+run/*.svwf
+run/*.dump
+run/*.vcd
