@@ -144,7 +144,7 @@ class kvt_proj_name_base_test extends uvm_test;
     end
 
     if(num_rst == 0) // No reset on the fly anymore
-      wait(1);       // infinite wait
+      wait(0);       // infinite wait
       
     repeat(num_pre_wait_rst_cycles)
       // @env.cfg.vif.proj_name_clk_if.clk;

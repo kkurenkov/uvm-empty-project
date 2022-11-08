@@ -36,7 +36,7 @@ TOOL_OPTS += -relax
 TOOL_OPTS += -namemap_mixgen
 TOOL_OPTS += -sv
 TOOL_OPTS += -timescale 1ns/1ns
-TOOL_OPTS += -vtimescale 1ns/1ns
+TOOL_OPTS += -vtimescale 1ps/1ps
 TOOL_OPTS += -bb_sigsize 40000
 TOOL_OPTS += -disable_sem2009
 TOOL_OPTS += -libext .v
@@ -57,7 +57,7 @@ ifeq ($(COVERAGE), 1)
 	COV_OPTS = +EN_COVERAGE
 	COV_OPTS += -coverage a
 # COV_OPTS += -covdut     ${TBENCH_NAME}
-	COV_OPTS += -covtest    ${TESTNAME}_${seed}
+	COV_OPTS += -covtest    $@_${seed}
 	COV_OPTS += -covworkdir ${COVERAGE_DIR}
 	COV_OPTS += -covfile    ./covfile.ccf
 	COV_OPTS += -covoverwrite
