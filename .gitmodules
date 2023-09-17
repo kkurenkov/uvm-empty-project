@@ -1,0 +1,3 @@
+[submodule "empty_project/submodules/kvt_clk_rst_vip"]
+	path = empty_project/submodules/kvt_clk_rst_vip
+	url = https://github.com/kkurenkov/kvt_clk_rst_vip.git

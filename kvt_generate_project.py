@@ -1,62 +1,142 @@
-#!/usr/bin/python3
-# -*- coding: utf-8 -*-
+#!/usr/bin/env python3
 
-import os
-import shutil
-import sys
 import argparse
+import os
+import stat
+import jinja2
+import shutil
+from datetime import date
+from jinja2 import Template
+from jinja2 import Environment, PackageLoader, FileSystemLoader
 
+# *****************************************************************************
+# Project Generator
+# *****************************************************************************
+def generate_project (  debug               
+                      , proj_name            
+                      , name    
+                      , surname  
+                      , email):
+    """
+    Walk the template directory and render any templates found into the destination directory
+    """
+    dest_dir = proj_name + "_verif"
+    # Create the template rendering environment
+    env = Environment(loader=jinja2.FileSystemLoader('empty_project'))
+
+# *****************************************************************************
+    project = {}                                        #**********************
+    project['author']  = name + " " + surname           #**********************
+    project['email']   = email                          #**********************
+    project['company'] = "KVT Verification Team"        #**********************
+    project['date']    = str(date.today())              #**********************
+    project['name']    = proj_name                      #**********************
+# *****************************************************************************
+
+    # Create destination path if required
+    if not os.path.exists(dest_dir):
+        os.mkdir(dest_dir)
+
+    template_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), "empty_project")
+
+    for dir, subdir_list, file_list in os.walk(template_path):
+        if debug:
+            print('In directory: %s' % dir)
+        # Replicate any subdir structure into the destination
+        try:
+            not_used,template_subdir = dir.split("empty_project/")
+        except ValueError:
+            template_subdir = ""
+        dest_path = os.path.join(dest_dir, template_subdir)
+        if not os.path.exists(dest_path):
+            os.mkdir(dest_path)
+
+        if(len(template_subdir) != 0):
+            if debug:
+                print ('Dir to make: %s' % template_subdir)
+            dest_path = os.path.join(dest_dir, template_subdir)
+            if not os.path.exists(dest_path):
+                os.mkdir(dest_path)
+        
+        for fname in file_list:
+            project['file'] = os.path.splitext(fname)[0]
+            if debug:
+                print('\tFound File: %s' % fname)
+            template = env.get_template(os.path.join(template_subdir, fname))
+            rendered_template = template.render(project=project)
+            
+            if (dir.split("/")[-1] == "run") or (fname == "tb_top.sv") or (fname == "README.md") or (fname == ".gitignore") or (fname == ".gitmodules") or (fname == ".gitlab-ci.yml") or ('submodules' in dir.split("/")):
+                if debug:
+                    print('\tCopy File: %s' % fname)
+                dest_filename = fname
+                dest_filename = os.path.join(dest_path, dest_filename)
+            else:
+                dest_filename = "kvt_" + proj_name + fname
+                dest_filename = os.path.join(dest_path, dest_filename)
+            if debug:
+                print('\tCreating File: %s' % dest_filename)
+            with open(dest_filename, 'w') as dp:
+                dp.write(rendered_template)
+                fname_tmp = dest_filename.split(".")
+                if((fname_tmp[-1] == "sh" ) or (fname_tmp[-1] == "py" )):
+                    print('\tFound File: %s' % dest_filename)
+                    st = os.stat(dest_filename)
+                    os.chmod(dest_filename, st.st_mode | stat.S_IEXEC)
+                
+
+    os.remove(dest_dir + "/kvt_" + proj_name +"_base.sv")
+
+    cwd = os.getcwd() 
+
+# *****************************************************************************
+# Program Flow
+# *****************************************************************************
+# -------------------------------------
+# Parse the command line options
+# -------------------------------------
 def main():
-	discr='Creating an UVM enviroment with base test. \t  \t  \t '
-	parser = argparse.ArgumentParser(description=discr, usage ="python proj_name")
-	parser.add_argument("proj_name", type=str, help= "The parameter proj_name determines the name of unit for testing.\n This parameter is required.")
-	args = parser.parse_args()
-	
-	EMPTY_PROJ_DIRECTORY = os.getcwd() + "/empty_project"
-	NEW_PROJ_DIRECTORY = os.getcwd() + "/" +  args.proj_name + "_verif"
+    parser = argparse.ArgumentParser(description='Project Generator')
+    parser.add_argument('-debug', action='store_true',
+                       help='Print Debug Messages')
+    parser.add_argument('--proj_name', action='store', required=True,
+                       help='Project Name')
 
-	# print("NEW_PROJ_DIRECTORY = ", NEW_PROJ_DIRECTORY)
-	# print("EMPTY_PROJ_DIRECTORY = ", EMPTY_PROJ_DIRECTORY)
+    parser.add_argument('--name', action='store',required=True,
+                       help='Author Name')
+    
+    parser.add_argument('--surname', action='store',required=True,
+                       help='Author Surname')
+    
+    parser.add_argument('--email', action='store',required=True,
+                       help='Author Email')
 
-	try:
-		shutil.copytree(EMPTY_PROJ_DIRECTORY, NEW_PROJ_DIRECTORY)
-	except Exception:
-		print("ERROR! Folder  " + NEW_PROJ_DIRECTORY + " EXIST! ")
-		sys.exit(2)
+    args = parser.parse_args()
 
-	p = os.walk(NEW_PROJ_DIRECTORY)
+    # -------------------------------------
+    # Actually do the work we intend to do here
+    # -------------------------------------
+    generate_project(   args.debug
+                     ,  args.proj_name
+                     ,  args.name
+                     ,  args.surname
+                     ,  args.email)
 
-	for root, dirs, files in p:
-		for file in files:
-			if((file.find(".f") != -1) or (file.find(".sv") != -1)):
-				# print(file)
-				template_f = open(os.path.join(root, file), "r")
-				template_f_context = template_f.read()
-				user_f_name = file.replace("proj_name", args.proj_name)
-				# print(user_f_name)
-				user_f_context = template_f_context.replace("proj_name", args.proj_name)
-				user_f_context = user_f_context.replace("proj_name".upper(), args.proj_name.upper())
-				user_f = open(os.path.join(root, user_f_name), "w")
-				user_f.write(user_f_context)
-				user_f.close()
-				template_f.close()
-				if(user_f_name != file):
-					os.remove(os.path.join(root, file))
-				# print("Creating file:", user_f_name)
-			else:
-				out = open(os.path.join(root, file+"_copy"), "w")
-				template_f = open(os.path.join(root, file), "r")
-				for line in template_f:
-					line = line.replace("proj_name", args.proj_name)
-					out.write(line)
-				out.close()
-				template_f.close()
-				os.system("mv " + root + "/" + file+"_copy " + root + "/" + file)
+    print('\t-------------------------------------------------------------------------------------------------\n')
+    print('\tNew project %s_verif was create!\n' % args.proj_name)
+    print('\t-------------------------------------------------------------------------------------------------\n')
+    print('\tAfter that')
+    print('\t1 Copy folders ./%s_verif/* in your repo' % args.proj_name)
+    print('\tBUT NOT ./%s_verif/submodules FOLDER!!!\t\n' % args.proj_name)
+    print('\t-------------------------------------------------------------------------------------------------\n')
+    print('\t2 Add kvt_clk_rst_vip like submodule in your repo')
+    print('\tgit submodule add https://github.com/kkurenkov/kvt_clk_rst_vip.git submodules/kvt_clk_rst_vip\n')
+    print('\t-------------------------------------------------------------------------------------------------\n')
+    print("\t3 For run project")
+    print("\tcd ./%s_verif/verification/run/" % args.proj_name)
+    print("\tmake base_test SEED=1\n")
+    print('\t-------------------------------------------------------------------------------------------------\n')
+    print("\tThat's all! Have a good day!")
 
-	print("\n\n")
-	print("Your project located in -> ", NEW_PROJ_DIRECTORY)
-	print("\nAll ok! \n")
-
-
+# -------------------------------------
 if __name__ == "__main__":
-	main()
+    main()

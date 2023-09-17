@@ -1,14 +1,5 @@
-// ----------------------------------------------------------------------------
-// Author:   Konstantin Kurenkov
-// Email:    krendkrend@gmail.com
-// Create date: 19/10/2022
-// FileName: kvt_base_report_catcher.sv
-//
-// ----------------------------------------------------------------------------
-
-`ifndef INC_KVT_BASE_REPORT_CATCHER
-`define INC_KVT_BASE_REPORT_CATCHER
-
+{% extends "_base.sv" %}
+{% block body %}
     typedef enum {BLACK,
                   RED,
                   GREEN,
@@ -44,7 +35,7 @@
                                     NO_COLOR:"\033[49m%s\033[0m"
                                   };
 
-class kvt_base_report_catcher extends uvm_report_catcher;
+class kvt_{{ project.name }}_base_report_catcher extends uvm_report_catcher;
 
     local string      format_string;
 
@@ -54,7 +45,7 @@ class kvt_base_report_catcher extends uvm_report_catcher;
     color_t           font_color;
     color_t           bg_color;
 
-    function new(string name="kvt_base_report_catcher", color_t f_c = GREEN, color_t b_c = NO_COLOR);
+    function new(string name="kvt_{{ project.name }}_base_report_catcher", color_t f_c = GREEN, color_t b_c = NO_COLOR);
         super.new(name);
         font_color = f_c;
         bg_color   = b_c;
@@ -94,6 +85,5 @@ class kvt_base_report_catcher extends uvm_report_catcher;
         return THROW;
     endfunction : catch
 
-endclass : kvt_base_report_catcher
-
-`endif // INC_KVT_BASE_REPORT_CATCHER
+endclass : kvt_{{ project.name }}_base_report_catcher
+{% endblock %}

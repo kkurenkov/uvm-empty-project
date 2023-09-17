@@ -1,9 +1,5 @@
-#| ----------------------------------------------------------------------------
-#| Author:   Konstantin Kurenkov
-#| Email:    krendkrend@gmail.com
-#| Create date: 19/10/2022
-#| ----------------------------------------------------------------------------
-
+{% block comment_header %}
+{% endblock %}
 export VE_HOME      ?= ../..
 export COVERAGE_DIR ?= ../coverage
 export TESTS_DIR    ?= ../tests
@@ -11,7 +7,7 @@ GUI ?= 0
 UVM_VERB ?= UVM_MEDIUM
 
 ifeq ($(GUI), 0)
-	ENGUI= +ADD_CLI_FORMATTER=1
+	ENGUI= +ADD_CLI_FORMATTER=1	
 else 
 	ENGUI= -gui
 endif
@@ -35,8 +31,8 @@ TOOL_OPTS += -v93
 TOOL_OPTS += -relax
 TOOL_OPTS += -namemap_mixgen
 TOOL_OPTS += -sv
-TOOL_OPTS += -timescale 1ns/1ns
-TOOL_OPTS += -vtimescale 1ps/1ps
+TOOL_OPTS += -timescale 1ns/1ps
+TOOL_OPTS += -vtimescale 1ns/1ps
 TOOL_OPTS += -bb_sigsize 40000
 TOOL_OPTS += -disable_sem2009
 TOOL_OPTS += -libext .v
@@ -44,7 +40,15 @@ TOOL_OPTS += -libext .sv
 TOOL_OPTS += -warn_multiple_driver
 TOOL_OPTS += -pathpulse
 TOOL_OPTS += -access +rwc
-# TOOL_OPTS += top tb_top
+####### NO Warnings #######
+TOOL_OPTS += -nowarn CUVWSI
+TOOL_OPTS += -nowarn STARMT
+TOOL_OPTS += -nowarn CUVIHR
+############################
+# TOOL_OPTS += -top tb_top
+# TOOL_OPTS += -uvmnoautocompile
+####### ####### #######
+
 ############################
 UVM_OPTS  = -uvmhome CDNS-1.2
 UVM_OPTS  += +UVM_NO_RELNOTES
@@ -66,7 +70,7 @@ endif
 #######################################################
 log_pars += sh parse_build_log.sh
 #######################################################
-SOURCE_LIST += -f ${VE_HOME}/verification/kvt_proj_name_files.f
+SOURCE_LIST += -f ${VE_HOME}/verification/kvt_{{ project.name }}_files.f
 #######################################################
 
 
@@ -87,7 +91,8 @@ get_tests: ## Get list of available tests with small description
 
 .PHONY: base_test
 base_test: ## Run UVM base_test
-	${TOOL} $(TOOL_OPTS) $(UVM_OPTS) $(RTL_OPTS) ${ENGUI} ${USER_DEF_OPTS} -svseed ${seed} ${SOURCE_LIST} +UVM_TESTNAME=kvt_proj_name_base_test
+	${TOOL} $(TOOL_OPTS) $(UVM_OPTS) $(RTL_OPTS) ${ENGUI} ${USER_DEF_OPTS} ${COV_OPTS} -svseed ${seed} ${SOURCE_LIST} \
+		+UVM_TESTNAME=kvt_{{ project.name }}_base_test
 
 .PHONY: ci_regression
 ci_regression: ## run regression test [TESTNAME=NAME_TEST] [ITERATIONS=2]

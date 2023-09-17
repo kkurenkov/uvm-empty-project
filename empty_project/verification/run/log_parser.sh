@@ -11,7 +11,7 @@ echo -e  >> $output_log
 
 # grep -o "FAILED\|*E\|UVM_ERROR\|UVM_FATAL" $input_log
 var1=`grep -m 1 "*F\|*E\|UVM_ERROR\|UVM_FATAL" $input_log`
-if grep -q "*F\|*E\|FAILED\|^ERROR\|UVM_FATAL /\|UVM_ERROR /" $input_log
+if grep -q "*F\|*E\|FAILED\|^ERROR\|UVM_FATAL [^:r]\|UVM_ERROR [^:r]" $input_log
 # if ( var1 > "" )
 then
  #   echo  "|                                TEST FAILED                                    |" >> $output_log

@@ -1,14 +1,10 @@
-## Introduction
+# {{ project.name }} verification plan
 
-Верификационный репозиторий с тестами для proj_name
-
-# proj_name verification plan 
-
-Verification plan for proj_name
+Verification plan for {{ project.name }}
 
 ## Introduction
 
-Данный документ описывает функциональные возможности модуля proj_name, их приоритет и сценари проверки. Возможности разделены на логические группы.
+Данный документ описывает функциональные возможности модуля {{ project.name }}, их приоритет и сценари проверки. Возможности разделены на логические группы.
 
 * Приоритет :red_circle: <b>HIGH</b> - жизненно важный функционал, запуск без него невозможен.  
 
@@ -20,20 +16,18 @@ Verification plan for proj_name
 
 ## Структура проекта
 
+```bash
+├── submodules               - git-subrepo;
+├── syn                      - synthesis scripts;
+└── verification             - verification directory {{ project.name }};
+    ├── docs                 - documentation;
+    ├── jg                   - formal verification;
+    ├── uvm                  - uvm environment;
+    ├── logs                 - simulation logs;
+    ├── run                  - directory with scripts;
+    └── tests                - library with tests;
 ```
-├── submodules               - git-сабмодули;
-├── syn                      - скрипты синтеза;
-└── verification             - поддиректория верификации;
-    ├── <module>             - для каждого модуля структура идентична;
-    ├──  ...
-    └── proj_name            - поддиректория для тестирования proj_name;
-        ├── docs             - документация;
-        ├── jg               - формальная верификация;
-        ├── uvm              - uvm окружение;
-        ├── logs             - логи моделирования;
-        ├── run              - рабочая директория запуска тестов;
-        └── tests            - библиотека тестов;
-```
+
 ----
 
 ## Критерии завершения верификации
@@ -61,12 +55,12 @@ Verification plan for proj_name
 
 |               Feature                                          |            Приоритет                        |
 |----------------------------------------------------------------|---------------------------------------------|
-|<b>!!! Вставить список проверяемых характеристик !!! </b>       |:red_circle: <b>HIGH</b>                     |
-|<b> Пример: Проверка адресного пространства </b>                |:red_circle: <b>HIGH</b>                     |
+|<b>!!! Вставить список проверяемых характеристик !!! </b>       |:red_circle:        <b>HIGH</b>              |
+|<b> Пример: Проверка адресного пространства </b>                |:red_circle:        <b>HIGH</b>              |
 |...............................                                 |:large_blue_circle: <b>MEDIUM</b>            |
 |...............................                                 |:large_blue_circle: <b>MEDIUM</b>            |
 |...............................                                 |:large_blue_circle: <b>MEDIUM</b>            |
-|...............................                                 |:white_circle: <b>LOW</b>                    |
+|...............................                                 |:white_circle:      <b>LOW</b>               |
 
 ----
 
@@ -86,13 +80,14 @@ Verification plan for proj_name
 ----
 
 ### Запуск тестов
-Запуск тестов осуществляется из директории `verification/<module>/run`.   
+
+Запуск тестов осуществляется из директории `verification/run`.
 
 * Примеры команд для запуска тестов
 
 ```bash
     make sim TEST=<testname> [SEED=<value>] [UVM_VERB=UVM_LOW] [...]
-    make check_addrspace_test_gui SEED=60 (запуск теста с определенным SEED-ом) UVM_VERB=UVM_LOW
+    make check_addrspace_test_gui SEED=42 (запуск теста с определенным SEED-ом) UVM_VERB=UVM_LOW
 ```
 
 

@@ -1,4 +1,4 @@
-# Subsystem interconnect
+{% block body %}
 
 ##########################  incdirs for files #######################
 # -incdir <dirs>            Specify directories to search for `include files
@@ -13,6 +13,9 @@
 #-f <filename>              Scan file for args relative to xrun invocation
 
 # -f ${VE_HOME}/submodules/*.f
-# -F ${VE_HOME}/submodules/proj_name/*.f
+# -F ${VE_HOME}/submodules/{{ project.name }}/*.f
 
-${VE_HOME}/verification/kvt_proj_name_inc.sv
+-F ${VE_HOME}/submodules/kvt_clk_rst_vip/compile.f
+
+${VE_HOME}/verification/tb_top.sv
+{% endblock %}
